@@ -1,4 +1,5 @@
 from tkinter import Tk, BOTH, Canvas
+from geo import Point, Line
 import time
 
 class Window:
@@ -23,6 +24,11 @@ class Window:
     def close(self):
         self.running = False
 
+    def draw_line(self, line: Line, fill_color: str) -> None:
+        line.draw(self.canvas, fill_color)
+
 if __name__ == "__main__":
     win = Window(800, 600)
+    line = Line(Point(12,12), Point(600,200))
+    win.draw_line(line, "#ec7bcb")
     win.wait_for_close()
