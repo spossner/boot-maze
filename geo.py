@@ -8,6 +8,15 @@ class Point:
     def __str__(self) -> str:
         return f"({self.x},{self.y})"
     
+    def translate_y(self, offset: float):
+        return Point(self.x,self.y+offset)
+
+    def translate_x(self, offset: float):
+        return Point(self.x+offset,self.y)
+    
+    def translate(self, dx: float, dy: float):
+        return Point(self.x+dx,self.y+dy)
+    
 
 class Line:
     def __init__(self, start: Point, end: Point) -> None:
