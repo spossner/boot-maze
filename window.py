@@ -21,7 +21,7 @@ class Window:
         self.running = True
         while self.running:
             self.redraw()
-            time.sleep(0.016)
+            time.sleep(0.0167)
 
     def close(self):
         self.running = False

@@ -32,17 +32,17 @@ class Maze:
             self._cells.append(col)
         for i in range(self.num_cols):
             for j in range(self.num_rows):
-                self._draw_cell(i, j)
+                self._cells[i][j].draw()
 
-    def _draw_cell(self, i, j, highlight = False):
+    def _draw_cell(self, i, j):
         c = self._cells[i][j]
-        c.draw(highlight)
-        self._animate()
+        c.draw()
+        # self._animate()
 
     def _animate(self):
         if self.win:
             self.win.redraw()
-            time.sleep(0.01)
+            time.sleep(0.03)
 
     def _break_entrance_and_exit(self):
         top_left = self._cells[0][0]
@@ -51,6 +51,17 @@ class Maze:
         bottom_right = self._cells[-1][-1]
         bottom_right.walls.bottom = False
         self._draw_cell(-1,-1)
+
+    def get_wall(self, i, j, dx, dy) -> bool:
+        if dx == 1:
+            return self._cells[i][j].walls.right
+        if dx == -1:
+            return self._cells[i][j].walls.left
+        if dy == 1:
+            return self._cells[i][j].walls.bottom
+        if dy == -1:
+            return self._cells[i][j].walls.top
+        
 
     def _break_wall(self, i,j, dx,dy):
         ni, nj = i+dx, j+dy
@@ -67,9 +78,13 @@ class Maze:
             self._cells[i][j].walls.top = False
             self._cells[ni][nj].walls.bottom = False
 
-    def _break_walls_r(self, i, j):
+    def break_walls(self):
+        self._break_entrance_and_exit()
+        self._break_walls_r(0,0,set())
+
+    def _break_walls_r(self, i, j, seen):
         c = self._cells[i][j]
-        c.visited = True
+        seen.add((i,j))
         while True:
             adjacent = []
             for dx, dy in DIRECTION:
@@ -77,8 +92,7 @@ class Maze:
                 nj = j + dy
                 if ni < 0 or nj < 0 or ni >= self.num_cols or nj >= self.num_rows:
                     continue
-                new_cell = self._cells[ni][nj]
-                if new_cell.visited:
+                if (ni,nj) in seen:
                     continue
                 adjacent.append((dx, dy))
             if not adjacent:
@@ -87,4 +101,38 @@ class Maze:
 
             dx, dy = random.choice(adjacent)
             self._break_wall(i,j,dx,dy)
-            self._break_walls_r(i+dx,j+dy)
+            self._break_walls_r(i+dx,j+dy,seen)
+
+    def solve(self) -> bool:
+        return self.solve_r(0,0,set())
+
+    def solve_r(self, i, j, seen):
+        seen.add((i,j))
+        if i == self.num_cols-1 and j == self.num_rows-1:
+            return True # found exit!
+        c1 = self._cells[i][j]
+        for dx, dy in DIRECTION:
+            ni = i + dx
+            nj = j + dy
+            if ni < 0 or nj < 0 or ni >= self.num_cols or nj >= self.num_rows:
+                continue
+            if (ni,nj) in seen:
+                continue
+            if not self.get_wall(i,j,dx,dy):
+                c2 = self._cells[ni][nj]
+                self.win.draw_move(c1,c2)
+                self._animate()
+                if self.solve_r(ni,nj,seen):
+                    return True
+                self.win.draw_move(c1,c2,True)
+                self._animate()
+                
+        return False
+
+    def draw_path(self, path):
+        for i in range(len(path)-1):
+            x1, y1 = path[i]
+            x2, y2 = path[i+1]
+            c1 = self._cells[x1][y1]
+            c2 = self._cells[x2][y2]
+            self.win.draw_move(c1, c2)

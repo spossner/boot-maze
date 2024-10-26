@@ -1,5 +1,4 @@
 from geo import Point, Line
-import collections
 from config import *
 from walls import Walls
 
@@ -10,12 +9,11 @@ class Cell:
         self.p2 = p2
         self.walls = walls
         self.win = win
-        self.visited = False
 
     def get_wall_color(self, wall_present: bool) -> str:
         return COLOR if wall_present else BACKGROUND
 
-    def draw(self, highlight=False):
+    def draw(self):
         if not self.win:
             return
         
@@ -23,9 +21,6 @@ class Cell:
         top_right = self.p1.translate_x(CELL_WIDTH)
         bottom_left = self.p2.translate_x(-CELL_WIDTH)
         bottom_right = self.p2
-
-        if highlight:
-            self.win.draw_rect(top_left, bottom_right, HIGHLIGHT_COLOR)
 
         self.win.draw_line(Line(top_left, bottom_left), fill_color=self.get_wall_color(self.walls.left))
         self.win.draw_line(Line(top_right, bottom_right), fill_color=self.get_wall_color(self.walls.right))
