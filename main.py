@@ -1,6 +1,7 @@
 from window import Window
 from maze import Maze
 import random
+from config import *
 
 BOOL = (True, False)
 def randBool():
@@ -8,9 +9,9 @@ def randBool():
 
 
 if __name__ == "__main__":
-    win = Window(800, 600)
+    win = Window(WIDTH, HEIGHT)
 
-    maze = Maze(10, 10, 16, 16, win)
+    maze = Maze(5, 5, NUM_ROWS, NUM_COLS, win)
     maze.break_walls()
 
     maze.solve()

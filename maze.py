@@ -121,13 +121,18 @@ class Maze:
             if not self.get_wall(i,j,dx,dy):
                 c2 = self._cells[ni][nj]
                 self.win.draw_move(c1,c2)
-                self._animate()
+                if self.should_redraw():
+                    self._animate()
                 if self.solve_r(ni,nj,seen):
                     return True
                 self.win.draw_move(c1,c2,True)
-                self._animate()
+                if self.should_redraw():
+                    self._animate()
                 
         return False
+    
+    def should_redraw(self) -> bool:
+        return random.randint(0,100) > 70
 
     def draw_path(self, path):
         for i in range(len(path)-1):
